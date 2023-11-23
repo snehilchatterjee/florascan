@@ -1,0 +1,7 @@
+flask
+sqlite3
+flask_cors
+pybase64
+numpy
+opencv-python
+tensorflow
