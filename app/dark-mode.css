@@ -1,0 +1,13 @@
+/* Apply dark mode styles to elements within the dark-mode class */
+body {
+    background-color: #1c2b2c; /* Dark background color */
+    color: #ffffff; /* Text color for dark mode */
+  
+    /* Add additional styling for elements as needed */
+  }
+  
+  .dark-mode a {
+    color: #4ad0d9; /* Links color in dark mode */
+  }
+  
+  /* Customize other styles for dark mode elements as needed */
