@@ -162,3 +162,4 @@ cython_debug/
 
 #cutsom_folders
 vit_base_384
+ViT_Timm_modified.ipynb
