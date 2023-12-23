@@ -6,7 +6,7 @@ The project aims to deliver a product that can not only classify a medicinal pla
 
 ### Contributions:
 
-Research on uses:
+##### Research on uses:
 Vyapti Gupta
 
 ##### API:
