@@ -37,7 +37,7 @@ def get_db_connection():
     return conn
 
 
-@app.route("/app/<path:path>")
+@app.route("/<path:path>")
 def serve_static(path):
     return send_from_directory("app", path)
 
