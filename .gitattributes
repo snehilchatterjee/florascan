@@ -1,0 +1,2 @@
+vit_base_384/ filter=lfs diff=lfs merge=lfs -text
+vit_base_384/** filter=lfs diff=lfs merge=lfs -text
