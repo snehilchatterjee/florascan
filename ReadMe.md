@@ -10,17 +10,13 @@ Research on uses:
 Vyapti Gupta
 
 ##### API:
-Amal Bangari
-Snehil Chatterjee
+Amal Bangari, Snehil Chatterjee
 
 ##### Model Training:
 Snehil Chatterjee
 
 ##### Front End:
-Sriansh Tripathy
-Heet B Jhaveri
-Amal Bangari
-Arko Jyoti Tewari
+Sriansh Tripathy, Heet B Jhaveri, Amal Bangari, Arko Jyoti Tewari
 
 ### Future Work:
 
