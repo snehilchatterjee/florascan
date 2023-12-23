@@ -21,3 +21,7 @@ Sriansh Tripathy
 Heet B Jhaveri
 Amal Bangari
 Arko Jyoti Tewari
+
+### Future Work:
+
+Making Custom CLIP models for provding model with more context
