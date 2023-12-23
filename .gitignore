@@ -164,4 +164,8 @@ cython_debug/
 sample_model/pizza_steak/
 BERT_TEST/saved_weights.pt
 sample_small_dataset/
-
+BERT_TEST/
+sample_model/
+sample_small_dataset/
+ViT_Model_Modification.ipynb
+ViT_Timm_modified.ipynb
