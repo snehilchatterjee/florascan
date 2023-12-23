@@ -169,3 +169,7 @@ sample_model/
 sample_small_dataset/
 ViT_Model_Modification.ipynb
 ViT_Timm_modified.ipynb
+<<<<<<< HEAD
+vit_base_384/
+=======
+>>>>>>> 750659e0ad9d2c7a5c0ef103b85d9e64609096eb

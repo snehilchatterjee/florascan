@@ -1,44 +1,110 @@
-import timm
-import torch
-import warnings
-import gradio as gr
+from flask import Flask, jsonify, request, send_from_directory
+import sqlite3
+from flask_cors import CORS
+import base64
+import numpy as np
 import cv2
+import numpy as np
+import torch
+from transformers import *
 
 device="cuda" if torch.cuda.is_available() else "cpu"
-warnings.filterwarnings("ignore")
-
-model_name="vit_base_patch8_224.augreg_in21k_ft_in1k"
-model=timm.create_model(model_name)
-model.head=torch.nn.Linear(in_features=model.head.in_features,out_features=2)
-state_dict=torch.load("models/vit_base_patch8_224.augreg_in21k_feature_extractor/checkpoint-5.pth")
-model.load_state_dict(state_dict)
-
-def flip_text(x):
-    return x[::-1]
 
 
-def model_inf(x):
-    im=torch.tensor(cv2.resize(x,(224,224)))
-    im=torch.from_numpy(cv2.resize(x,(224,224))).type(torch.float32)
-    im=im.permute(2,0,1)
-    im=im.unsqueeze(dim=0)
-    result=torch.argmax(torch.softmax(model(im),dim=1),dim=1)
-    print(result)
-    if(result):
-        return "Pneumonia"
-    else:
-        return "Normal"
+model_name = "google/vit-base-patch16-384"
 
 
+image_processor = ViTImageProcessor.from_pretrained(model_name)
+model = ViTForImageClassification.from_pretrained(
+    model_name,
+    num_labels=447,
+    ignore_mismatched_sizes=True,
+)
 
-with gr.Blocks() as app:
-    gr.Markdown("Pneumonia Classifier")
-    with gr.Tab("Classification by image"):
-        with gr.Row():
-            gr.Interface(fn=model_inf, inputs="image", outputs="text",allow_flagging="never")
-    with gr.Tab("Classification by audio"):
-        gr.Interface(fn=flip_text, inputs="audio", outputs="text",allow_flagging="never")
+best_checkpoint = 24000
+model = ViTForImageClassification.from_pretrained(f"./vit_base_384/checkpoint-{best_checkpoint}").to(device)
 
 
+app = Flask(__name__)
+CORS(app)
 
-app.launch(share=True)
+#loaded_model = tf.keras.models.load_model("epoch_4th")
+
+
+def get_db_connection():
+    conn = sqlite3.connect("after_pruning.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+@app.route("/app/<path:path>")
+def serve_static(path):
+    return send_from_directory("app", path)
+
+
+@app.route("/api/plant/<plant_name>", methods=["GET"])
+def api_get_plant(plant_name):
+    print(plant_name)
+    conn = get_db_connection()
+    plant = conn.execute(
+        "SELECT id, name, common_name, uses FROM plants WHERE name = ?", (plant_name,)
+    ).fetchone()
+    if plant is None:
+        return jsonify({"error": "Plant not found"})
+    states = conn.execute(
+        "SELECT state FROM states WHERE plant_id = ? GROUP BY state", (plant["id"],)
+    ).fetchall()
+    return jsonify(
+        binomial_name=plant["name"],
+        common_name=plant["common_name"],
+        uses=plant["uses"],
+        states=[state["state"] for state in states],
+    )
+
+
+@app.route("/api/all_plants", methods=["GET"])
+def api_all_plants():
+    conn = get_db_connection()
+    plants = conn.execute("SELECT name, uses FROM plants").fetchall()
+    return jsonify(
+        plants=[
+            {
+                "name": plant["name"],
+                "uses": plant["uses"],
+            }
+            for plant in plants
+        ]
+    )
+
+
+@app.route("/api/predict/", methods=["POST"])
+def api_predict():
+    global loaded_model
+    im64 = request.json.get("image")
+    imb = base64.b64decode(im64)
+    im_arr = np.frombuffer(imb, dtype=np.uint8)
+    img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
+
+    image=torch.from_numpy(img).to(device)
+    pixel_values = image_processor(image, return_tensors="pt")["pixel_values"].to("cuda")
+    logits=model(pixel_values)
+    predictions=torch.softmax(logits.logits,dim=1)
+    predicted_class_index = torch.argmax(torch.softmax(logits.logits,dim=1),dim=1).item()
+
+    conn = get_db_connection()
+    print(predicted_class_index + 1)
+
+    name = conn.execute(
+        "SELECT class FROM model_labels WHERE id=?",
+        (int(predicted_class_index) + 1,),
+    ).fetchone()
+    name = name["class"]
+    return jsonify(
+        {"prediction": name, "probability": str(torch.argmax(predictions, dim=1).item())}
+    )
+
+
+if __name__ == "__main__":
+    # app.debug = True
+    app.run(debug=True, host="0.0.0.0", port=8080)
+    # app.run()  # run app

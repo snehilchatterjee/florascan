@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./tailwind.css" rel="stylesheet" />
+    <link href="./dark-mode.css" rel="stylesheet" />
+    <link href="logo.jpg" rel="icon" type="image/x-icon" />
+    <title>FloraScan</title>
+  </head>
+  <body>
+    <nav class="bg-green-600 text-white items-center px-8 justify-center flex">
+      <h1 style="color: #ffffff">FloraScan</h1>
+    </nav>
+    <div class="mx-auto p-4 max-w-2xl my-4 flex flex-col justify-center">
+      <div class="justify-center items-center flex flex-col">
+        <span> <a href="index.html" class="boxed mb-3">Home</a></span>
+        <span>
+          <a href="search.html" class="boxed mb-3">Search our database</a>
+        </span>
+      </div>
+      <input
+        class="border-4 rounded-xl w-full text-center mt-4 bg-teal-900 border-teal-900"
+        type="text"
+        placeholder="Search"
+        id="searchInput"
+      />
+      <table class="mt-4">
+        <th>Name</th>
+        <th>Uses</th>
+      </table>
+      <div class="overflow-scroll mt-6" style="max-height: 50vh">
+        <table class="w-full table-fixed overflow-scroll">
+          <tbody id="plantTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <script src="./search.js"></script>
+  </body>
+</html>
